@@ -32,3 +32,26 @@ For help getting started with Flutter development, view the online
 
 For instructions integrating Flutter modules to your existing applications,
 see the [add-to-app documentation](https://flutter.dev/docs/development/add-to-app).
+
+
+## Configuration:
+```
+Doctor summary (to see all details, run flutter doctor -v):
+[✓] Flutter (Channel stable, 3.19.6, on macOS 14.4.1 23E224 darwin-arm64 (Rosetta), locale en-IN)
+[✓] Android toolchain - develop for Android devices (Android SDK version 33.0.1)
+[!] Xcode - develop for iOS and macOS (Xcode 15.3)
+! CocoaPods 1.12.1 out of date (1.13.0 is recommended).
+CocoaPods is used to retrieve the iOS and macOS platform side's plugin code that responds to your plugin usage on the Dart side.
+Without CocoaPods, plugins will not work on iOS or macOS.
+For more info, see
+https://flutter.dev/platform-plugins
+To upgrade see
+https://guides.cocoapods.org/using/getting-started.html#updating-cocoapods
+for instructions.
+[✓] Chrome - develop for the web
+[✓] Android Studio (version 2021.2)
+[✓] Android Studio (version 2022.2)
+[✓] VS Code (version 1.88.1)
+[✓] Connected device (4 available)
+[✓] Network resources
+```
