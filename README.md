@@ -6,7 +6,7 @@ A new Flutter module project.
 
 Steps:
 
-1.Build a new AAR file by `flutter build aar`
+1.Build a new AAR file by `flutter build aar` from this Flutter Module Project
 
 2.Copy the maven URL from the terminal after the generation of aar file
 
