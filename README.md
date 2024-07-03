@@ -4,6 +4,15 @@ We have created a Flutter module with the Scandit SDK(scandit_flutter_datacaptur
 
 ## Steps to be followed
 
+Note: If you need to reproduce the black screen issue due to Scandit initialisation
+
+You need to uncomment, https://github.com/VickyIos/flutterScanditSampleModule/blob/b890e1d07c6b467566eb78560f178780f397faa6/lib/main.dart#L13
+
+After uncommenting and follow the screenshot & you can start from step 1 
+
+<img width="342" alt="Note" src="https://github.com/VickyIos/flutterScanditSampleModule/assets/20942319/011fe31f-4832-4811-8d96-63234ea64155">
+
+
 1.Build a new AAR file by using this command-line `flutter build aar`
 
 2.Copy the maven URL from the terminal after the generation of aar file, this will be used in our Native Android App. 
