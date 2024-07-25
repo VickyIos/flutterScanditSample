@@ -64,3 +64,93 @@ for instructions.
 [✓] Connected device (4 available)
 [✓] Network resources
 ```
+
+## Update on 25 July 
+
+Flutter Module App - Explained:
+
+- Here is the basic screens of our flutter screens.
+- Scan functionality using Scandit SDK is implemented in Screen 2
+- These screens are placed within TabBar & TabBarView in HomeScreen Class, so this holds the 3 screens.
+- In Home Screen, you can find a back button. So with this back button you can navigate back to Native App.
+
+Issue:
+
+1.Runtime error on logcat:
+
+Steps to be followed to reproduce the issue:
+
+Run Native app -> tap on "Click to open flutter module" -> this will open flutter screens -> Tap Screen 2 (Scan functionality) -> Tap back button on App Bar while you are at screen 2 -> Check Logcat you can find the below run time errors
+
+```
+2024-07-25 15:52:34.731 29847-30045/com.rfxcel.driscollsTest E/flutter: [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled Exception: MissingPluginException(No implementation found for method switchCameraToDesiredState on channel com.scandit.datacapture.core/method_channel)
+    #0      MethodChannel._invokeMethod (package:flutter/src/services/platform_channel.dart:332:7)
+    <asynchronous suspension>
+2024-07-25 15:52:34.733 29847-30045/com.rfxcel.driscollsTest I/flutter: MissingPluginException(No implementation found for method barcodeTrackingFinishDidUpdateSession on channel com.scandit.datacapture.barcode.tracking/method_channel)
+2024-07-25 15:52:36.610 29847-30316/com.rfxcel.driscollsTest I/sdc-frameworks: Callback `BarcodeTrackingListener.didUpdateSession` not finished after 2000 milliseconds.
+```
+
+2.Error 1025:
+
+Steps to be followed to reproduce the issue:
+
+Run Native app -> Tap on "Click to open flutter module" button -> this will open flutter screens -> Tap Screen 2 (Scan functionality) -> Tap back button on App Bar while you are at screen 2 -> This will navigate to Native App(At the same time Check Logcat you can find the below run time errors) -> Tap again on "Click to open flutter module" button -> This will directly open Screen 2 with Scan functionality -> Now you can see this below error on Camera view.
+
+Note: Same scenario works perfectly fine on Scandit v6.20.0
+
+```
+Error 1025 - Disposed Context
+The data capture context has been disposed and can't be used anymore
+```
+
+
+Issue Scenario:
+
+This problem occurs when we navigate from our Flutter module Scandit's Scan Screen to Native App.
+
+While navigating out of our flutter module. App Lifecycle will get change which will cause the code below to run.
+```
+/// Based on the Change in App Lifecycle
+/// We will change FrameSourceState value according to 
+/// AppLifecycleState.resumed or AppLifecycleState.paused
+_camera?.switchToDesiredState(FrameSourceState.off);
+```
+
+Above mentioned code will invoke the Scandit SDK method channel 
+```
+Future<void> switchCameraToDesiredState(FrameSourceState desiredState) {
+  return methodChannel.invokeMethod(FunctionNames.switchCameraToDesiredState, desiredState.toString());
+}
+```
+
+With this Scandit SDK method, below runtime error throws in Logcat 
+```
+2024-07-25 15:52:34.731 29847-30045/com.rfxcel.driscollsTest E/flutter: [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled Exception: MissingPluginException(No implementation found for method switchCameraToDesiredState on channel com.scandit.datacapture.core/method_channel)
+    #0      MethodChannel._invokeMethod (package:flutter/src/services/platform_channel.dart:332:7)
+    <asynchronous suspension>
+2024-07-25 15:52:34.733 29847-30045/com.rfxcel.driscollsTest I/flutter: MissingPluginException(No implementation found for method barcodeTrackingFinishDidUpdateSession on channel com.scandit.datacapture.barcode.tracking/method_channel)
+2024-07-25 15:52:36.610 29847-30316/com.rfxcel.driscollsTest I/sdc-frameworks: Callback `BarcodeTrackingListener.didUpdateSession` not finished after 2000 milliseconds.
+```
+
+Since Scandit SDK throws this runtime error on Logcat, while we navigate back to our Flutter Module from Native App
+
+As a result, Scandit SDK prompts the below error in the Camera Viewfinder and I have attached a screenshot of it
+```
+Error 1025 - Disposed Context
+The data capture context has been disposed and can't be used anymore
+```
+![Scandit v6 24 2_error](https://github.com/user-attachments/assets/268a090b-a451-40b2-9797-1cc3ddc17762)
+
+FYI: I have attached a screenrecord of the issue which is on Scandit SDK v6.24.2 and also screenrecord without any issues on Scandit SDK v6.20.0
+
+Screenrecord with ScanditSDK v6.24.2 - Logcat errors & Disposed Context Error.
+
+https://github.com/user-attachments/assets/e3099081-af7f-4dbd-8b1a-d595838db219
+
+Screenrecord with ScanditSDK v6.20.0 - No Issues.
+
+https://github.com/user-attachments/assets/ab50fe92-6836-4e3d-a539-b715f6504191
+
+## With Scandit SDK v6.20.0 everything works well on our app (no runtime errors or no scandit camera viewfinder error) without any code changes, but not on SDK v6.24.2
+
+Right now, We are blocked with these errors
