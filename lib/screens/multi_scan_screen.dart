@@ -39,6 +39,7 @@ class _MultiScanScreenState extends State<MultiScanScreen>
     // Use the recommended camera settings for the BarcodeTracking mode.
     var cameraSettings = BarcodeTracking.recommendedCameraSettings;
 
+    // This is the best settings for our usecase
     cameraSettings.preferredResolution = VideoResolution.uhd4k;
     cameraSettings.focusRange = FocusRange.near;
     cameraSettings.zoomFactor = zoomValue;
@@ -85,11 +86,7 @@ class _MultiScanScreenState extends State<MultiScanScreen>
     if (_camera != null) {
       _context.setFrameSource(_camera!);
     }
-    try {
-      _camera?.switchToDesiredState(FrameSourceState.on);
-    } catch (e) {
-      debugPrint("error on init state => $e");
-    }
+    _barcodeTracking.isEnabled = true;
   }
 
   void _checkPermission() {
@@ -257,25 +254,54 @@ class _MultiScanScreenState extends State<MultiScanScreen>
     if (state == AppLifecycleState.resumed) {
       var cameraAccessStatus = await Permission.camera.status;
       if (cameraAccessStatus == PermissionStatus.granted) {
-        _isPermissionMessageVisible = false;
-        _camera?.switchToDesiredState(FrameSourceState.on);
+        setState(() {
+          _isPermissionMessageVisible = false;
+          if (_camera != null && mounted) {
+            try {
+              _camera?.switchToDesiredState(FrameSourceState.on);
+            } catch (e) {
+              debugPrint('Unable to turn on camera, $e');
+            }
+          }
+        });
       }
     } else if (state == AppLifecycleState.paused) {
-      _camera?.switchToDesiredState(FrameSourceState.off);
+      if (_camera != null && mounted) {
+        var currentState = await _camera?.currentState;
+        if (currentState == FrameSourceState.on) {
+          try {
+            _camera?.switchToDesiredState(FrameSourceState.off);
+          } catch (e) {
+            debugPrint('Unable to turn off camera, $e');
+          }
+        }
+        setState(() {});
+      }
     }
     setState(() {});
   }
 
   @override
-  void dispose() {
-      // TODO: implement dispose
-      super.dispose();
-      WidgetsBinding.instance.removeObserver(this);
-      _barcodeTracking.removeListener(this);
-      _captureView.removeListener(this);
-      _barcodeTracking.isEnabled = false;
-      _camera?.switchToDesiredState(FrameSourceState.off);
-      _context.removeAllModes();
+  Future<void> dispose() async {
+    // TODO: implement dispose
+    super.dispose();
+    WidgetsBinding.instance.removeObserver(this);
+    _barcodeTracking.removeListener(this);
+    _captureView.removeListener(this);
+    _barcodeTracking.isEnabled = false;
+    try {
+      var currentState = await _camera?.currentState;
+      if (currentState == FrameSourceState.on) {
+        try {
+          _camera?.switchToDesiredState(FrameSourceState.off);
+        } catch (e) {
+          debugPrint('Unable to turn off camera, $e');
+        }
+      }
+    } catch (e) {
+      debugPrint('Caught PlatformException: $e');
+    }
+    _context.removeAllModes();
   }
 
   @override
