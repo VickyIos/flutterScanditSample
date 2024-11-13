@@ -161,11 +161,11 @@ Previous issues were addressed, Now we are using scandit_flutter_datacapture_bar
 
 And we use Zebra Device(TC22/TC27) for testing 
 
-The issue which we are facing is, Our Mobile app face oveheating issue, the Scandit Camera Viewfinder freezes over time and Camera Viewfinder turns Black while we continuesly scans QR codes and make our App unusable.
+The issue which we are facing is, Our Mobile app face overheating issue, the Scandit Camera Viewfinder freezes over time and Camera Viewfinder turns Black while we continuously scan QR codes and make our App unusable.
 
 In this minimal project, I have integrated only the scandit framework and no other computation or functionality added.
 
-Even only with Scandit Framework, the Device gets oveheat & the Scandit Camera Viewfinder freezes over time
+Even only with Scandit Framework, the Device gets overheat & the Scandit Camera Viewfinder freezes over time
 
 I have attached video for your reference, Kindly check.
 
